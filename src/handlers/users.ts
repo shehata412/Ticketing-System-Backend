@@ -64,18 +64,28 @@ const login = async (req: Request, res: Response): Promise<void> => {
 }
 
 const showusertickets = async (req: Request, res: Response): Promise<void>=>{
-        if(!req.body.user_id){
-        res.status(400).json({msg: 'Please include user_id'});
+        console.log(req.body.isAdmin);
+        if (!req.body.isAdmin) {
+            try {
+                const allTickets = await Ticket.findAll({
+                    where: {
+                        user_id: req.body.user_id
+                    }
+                });
+                res.json(allTickets);
+                return;
+            } catch (e) {
+                res.status(500).json(e);
+                return;
+            }
         }
     try {
-        const allTickets = await Ticket.findAll({
-            where: {
-                user_id: req.body.user_id
-            }
-        });
+        const allTickets = await Ticket.findAll();
         res.json(allTickets);
+        return
     } catch(e){
         res.status(500).json(e);
+        return
     }
 }
 
@@ -83,10 +93,10 @@ const showusertickets = async (req: Request, res: Response): Promise<void>=>{
 
 
 const userRoutes = (app: express.Application): void =>{
-    app.post('/user', create);
+    app.post('/create-user', create);
     app.get('/user', show);
     app.post('/login', login);
-    app.post('/user/tickets/', showusertickets);
+    app.get('/user/tickets/', showusertickets);
 }
 
 export default userRoutes;

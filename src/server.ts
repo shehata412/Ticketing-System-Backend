@@ -4,11 +4,14 @@ import dotenv from "dotenv";
 import {sequelize} from './db/config/sequelize';
 import userRoutes from './handlers/users';
 import ticketsRoute from "./handlers/tickets";
+import { authenticate } from './middlewares/authenticate';
+
 dotenv.config();
 
 const port: string | 3000  = process.env.PORT || 3000;
 const app: Application = express(); // create express app
 app.use(bodyParser.json()); // add body parser
+app.all('*', authenticate);
 
 userRoutes(app);
 ticketsRoute(app);

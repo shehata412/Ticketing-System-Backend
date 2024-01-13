@@ -18,26 +18,34 @@ type Ticket_data = {
 
 const create = async (req: Request, res: Response): Promise<void> => {
 
-    if(!req.body.title || !req.body.description || !req.body.priority || !req.body.status || !req.body.user_id){
-        res.status(400).json({msg: 'Please include title, description, priority, status and user_id'});
+    if(!req.body.title || !req.body.description || !req.body.priority || !req.body.status){
+        res.status(400).json({msg: 'Please include title, description, priority, status'});
         return;
     }
 
     try {
         const newTicket = await Ticket.create(req.body);
         res.json(newTicket);
+        return;
     } catch (e) {
         res.status(500).json(e);
+        return;
     }
 }
 
 const showall = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const allTickets = await Ticket.findAll();
-        res.json(allTickets);
-    } catch (e) {
-        res.status(500).json(e);
+    if(req.body.isAdmin) {
+        try {
+            const allTickets = await Ticket.findAll();
+             res.json(allTickets);
+             return;
+        } catch (e) {
+            res.status(500).json(e);
+            return;
+        }
     }
+    res.status(403).json({msg: 'You are not authorized to view all tickets'});
+    return;
 }
 
 const updateTicket = async (req: Request, res: Response): Promise<void> => {
@@ -52,22 +60,9 @@ const updateTicket = async (req: Request, res: Response): Promise<void> => {
         }
 
         const ticketData: Ticket_data = ticket?.get({ plain: true }) as Ticket_data;
-        const token: string | undefined = req.headers.authorization?.split(' ')[1];
 
-        try {
-            if (!token) {
-                res.status(401).json({ msg: 'Token missing' });
-                return;
-            }
-
-            const decoded = jwt.verify(token, process.env.TOKEN_SECRET as string, { algorithms: ['HS256'] }) as JwtPayload;
-
-            if (decoded.id !== ticketData.user_id && !decoded.isAdmin) {
-                res.status(403).json({ msg: 'You are not authorized to update this ticket' });
-                return;
-            }
-        } catch (e) {
-            res.status(401).json({ msg: 'Invalid token' });
+        if (req.body.user_id !== ticketData.user_id && !req.body.isAdmin) {
+            res.status(403).json({ msg: 'You are not authorized to update this ticket' });
             return;
         }
         await Ticket.update(req.body, {
@@ -76,8 +71,10 @@ const updateTicket = async (req: Request, res: Response): Promise<void> => {
             }
         });
         res.json({ msg: 'Ticket updated successfully' });
+        return;
     } catch (e) {
         res.status(500).json(e);
+        return;
     }
 }
 
