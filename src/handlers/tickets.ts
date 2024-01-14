@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import {Ticket}  from "../db/models";
-import jwt, {JwtPayload} from "jsonwebtoken";
 import {Model} from "sequelize";
 
 type Ticket_data = {
