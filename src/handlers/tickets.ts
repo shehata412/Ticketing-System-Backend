@@ -43,8 +43,18 @@ const showall = async (req: Request, res: Response): Promise<void> => {
             return;
         }
     }
-    res.status(403).json({msg: 'You are not authorized to view all tickets'});
-    return;
+    try {
+        const allTickets = await Ticket.findAll({
+            where: {
+                user_id: req.body.user_id
+            }
+        });
+        res.json(allTickets);
+        return;
+    } catch (e) {
+        res.status(500).json(e);
+        return;
+    }
 }
 
 const updateTicket = async (req: Request, res: Response): Promise<void> => {
