@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import {Ticket}  from "../db/models";
 import {Model} from "sequelize";
+import multer from "multer";
 
 type Ticket_data = {
     id?: number;
@@ -14,13 +15,16 @@ type Ticket_data = {
     updated_at?: Date;
 }
 
+const upload = multer({ dest: 'uploads/' })
 
-const create = async (req: Request, res: Response): Promise<void> => {
+
+const create = async (req: Request,res: Response): Promise<void> => {
 
     if(!req.body.title || !req.body.description || !req.body.priority || !req.body.status){
         res.status(400).json({msg: 'Please include title, description, priority, status'});
         return;
     }
+    console.log(req.file);
 
     try {
         const newTicket = await Ticket.create(req.body);
@@ -32,7 +36,7 @@ const create = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-const showall = async (req: Request, res: Response): Promise<void> => {
+const show = async (req: Request, res: Response): Promise<void> => {
     if(req.body.isAdmin) {
         try {
             const allTickets = await Ticket.findAll();
@@ -88,8 +92,8 @@ const updateTicket = async (req: Request, res: Response): Promise<void> => {
 }
 
 const ticketsRoute = (app: express.Application): void =>{
-    app.post('/ticket', create);
-    app.get('/tickets', showall);
+    app.post('/ticket',upload.single('attachment') ,create);
+    app.get('/tickets', show);
     app.patch('/ticket/:id', updateTicket);
 }
 
