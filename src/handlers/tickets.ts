@@ -24,7 +24,10 @@ const create = async (req: Request,res: Response): Promise<void> => {
         res.status(400).json({msg: 'Please include title, description, priority, status'});
         return;
     }
-    console.log(req.file);
+    if(req.file){
+        req.body.attachment = req.file.path;
+        console.log(req.file);
+    }
 
     try {
         const newTicket = await Ticket.create(req.body);
