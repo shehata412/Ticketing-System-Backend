@@ -15,7 +15,7 @@ export const Ticket = sequelize.define('Ticket', {
         allowNull: false
     },
     priority: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false
     },
     status: {
