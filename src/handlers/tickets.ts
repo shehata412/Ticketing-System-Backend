@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import {Ticket}  from "../db/models";
 import {Model} from "sequelize";
 import multer from "multer";
+import path from "path";
 
 type Ticket_data = {
     id?: number;
@@ -15,7 +16,14 @@ type Ticket_data = {
     updated_at?: Date;
 }
 
-const upload = multer({ dest: 'uploads/' })
+const storage = multer.diskStorage({
+    destination: 'uploads/',
+    filename: function (req,file,cb){
+        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+})
+
+const upload = multer({ storage: storage })
 
 
 const create = async (req: Request,res: Response): Promise<void> => {
@@ -25,7 +33,7 @@ const create = async (req: Request,res: Response): Promise<void> => {
         return;
     }
     if(req.file){
-        req.body.attachment = req.file.path;
+        req.body.attachment = `${req.file.path}/${req.file.originalname}`;
         console.log(req.file);
     }
 
