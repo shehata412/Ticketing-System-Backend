@@ -111,10 +111,42 @@ const updateTicket = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
+const deleteTicket = async (req: Request, res: Response): Promise<void> => {
+    const id: string = req.params.id;
+
+    try {
+        const ticket: Model<Ticket_data, Ticket_data> | null = await Ticket.findByPk(id);
+
+        if (!ticket) {
+            res.status(400).json({ msg: 'Ticket not found' });
+            return;
+        }
+
+        const ticketData: Ticket_data = ticket?.get({ plain: true }) as Ticket_data;
+
+        if ((req as UserRequest).user.id !== ticketData.user_id && !(req as UserRequest).user.isAdmin) {
+            res.status(403).json({ msg: 'You are not authorized to delete this ticket' });
+            return;
+        }
+        await Ticket.destroy({
+            where: {
+                id
+            }
+        });
+        res.json({ msg: 'Ticket deleted successfully' });
+        return;
+    } catch (e) {
+        res.status(500).json(e);
+        return;
+    }
+
+}
+
 const ticketsRoute = (app: express.Application): void =>{
     app.post('/ticket',upload.single('attachment') ,create);
     app.get('/tickets', show);
     app.patch('/ticket/:id', updateTicket);
+    app.delete('/ticket/:id', deleteTicket)
 }
 
 export default ticketsRoute;
