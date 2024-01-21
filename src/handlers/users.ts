@@ -4,6 +4,14 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import {Model} from "sequelize";
 
+
+interface UserRequest extends Request {
+    user: {
+      id: number;
+      isAdmin: boolean;
+    }
+  }
+
     type User_data = {
     id?: number;
     username: string;
@@ -15,6 +23,9 @@ import {Model} from "sequelize";
 
 
 const show = async (req: Request, res: Response): Promise<void>=>{
+    if(!(req as UserRequest).user.isAdmin) {
+        res.status(401).json({msg: 'You are not authorized to view this page'});
+    }
     try {
         const allUsers = await User.findAll();
         res.json(allUsers);
@@ -63,40 +74,12 @@ const login = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-const showusertickets = async (req: Request, res: Response): Promise<void>=>{
-        console.log(req.body.isAdmin);
-        if (!req.body.isAdmin) {
-            try {
-                const allTickets = await Ticket.findAll({
-                    where: {
-                        user_id: req.body.user_id
-                    }
-                });
-                res.json(allTickets);
-                return;
-            } catch (e) {
-                res.status(500).json(e);
-                return;
-            }
-        }
-    try {
-        const allTickets = await Ticket.findAll();
-        res.json(allTickets);
-        return
-    } catch(e){
-        res.status(500).json(e);
-        return
-    }
-}
-
-
 
 
 const userRoutes = (app: express.Application): void =>{
     app.post('/create-user', create);
     app.get('/user', show);
     app.post('/login', login);
-    app.get('/user/tickets/', showusertickets);
 }
 
 export default userRoutes;
