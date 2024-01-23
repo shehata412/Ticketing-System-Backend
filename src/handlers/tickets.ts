@@ -4,6 +4,7 @@ import {Ticket}  from "../db/models";
 import {Model} from "sequelize";
 import multer from "multer";
 import path from "path";
+import fs from  "fs";
 
 
 
@@ -147,6 +148,15 @@ const deleteTicket = async (req: Request, res: Response): Promise<void> => {
         }
 
         const ticketData: Ticket_data = ticket?.get({ plain: true }) as Ticket_data;
+
+        if(ticketData.attachment){
+            fs.unlink(ticketData.attachment,(err) => {
+                if(err){
+                    console.log(err);
+                    return;
+                }
+            });
+        }
 
         if ((req as UserRequest).user.id !== ticketData.user_id && !(req as UserRequest).user.isAdmin) {
             res.status(403).json({ msg: 'You are not authorized to delete this ticket' });
