@@ -157,7 +157,6 @@ const deleteTicket = async (req: Request, res: Response): Promise<void> => {
                 }
             });
         }
-
         if ((req as UserRequest).user.id !== ticketData.user_id && !(req as UserRequest).user.isAdmin) {
             res.status(403).json({ msg: 'You are not authorized to delete this ticket' });
             return;
@@ -182,6 +181,7 @@ const ticketsRoute = (app: express.Application): void =>{
     app.get('/ticket/:id', showone);
     app.patch('/ticket/:id',upload.single('attachment')  ,updateTicket);
     app.delete('/ticket/:id', deleteTicket);
+    
 }
 
 export default ticketsRoute;
