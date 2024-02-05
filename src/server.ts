@@ -5,6 +5,7 @@ import {sequelize} from './db/config/sequelize';
 import userRoutes from './handlers/users';
 import ticketsRoute from "./handlers/tickets";
 import { authenticate } from './middlewares/authenticate';
+import { getAllBoards, getAllBoardsList, CreateCard } from './utils/trello';
 import cors from 'cors';
 
 dotenv.config();
@@ -20,6 +21,7 @@ ticketsRoute(app);
 
 app.listen(process.env.PORT || 3000, (): void=>{
     console.log(`Listening on port ${port}`)
+    //CreateCard(process.env.TRELLO_MTS_LIST_ID as string, "Test labels", "This is a new label", [(process.env.LABEL_HIGH) as string, (process.env.LABEL_BACKEND) as string ]);
     sequelize.sync()
         .then(() => console.log('Database connected...'))
         .catch((err: Error) => console.log('Error: ' + err))
