@@ -12,7 +12,7 @@ async function send_ticket(message: string) {
         return console.error('Please provide a message');
     }
   const chatCompletion = await openai.chat.completions.create({
-    messages: [{ role: 'user', content: 'Please reply in one word (backend or frontend or both) is this issue a backend issue or a frontend issue? ' + message }],
+    messages: [{ role: 'user', content: 'Please reply in one word "backend" or "frontend" or "both"' + message }],
     model: 'gpt-3.5-turbo',
   });
   return chatCompletion.choices[0].message.content;
