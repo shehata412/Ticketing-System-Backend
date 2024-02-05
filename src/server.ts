@@ -15,6 +15,7 @@ const app: Application = express(); // create express app
 app.use(bodyParser.json()); // add body parser
 app.use(cors());
 app.all('*', authenticate);
+app.use('/uploads', express.static('uploads'));
 
 userRoutes(app);
 ticketsRoute(app);
