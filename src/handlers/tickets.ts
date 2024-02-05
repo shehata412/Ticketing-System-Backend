@@ -44,11 +44,14 @@ const create = async (req: Request,res: Response): Promise<void> => {
         res.status(400).json({msg: 'Please include title, description, priority, status'});
         return;
     }
+    let url: string = ""
     if(req.file){
         req.body.attachment = path.join(uploadDirectory,req.file.filename);
     }
     req.body.user_id = (req as UserRequest).user.id;
     try {
+        if(req.file) url = `https://ticket-api.masters-ts.com/${uploadDirectory}${req.file.filename}`;
+        console.log(url);
         let Label_issue : string = "";
         let Label_priority : string = "";
         const newTicket = await Ticket.create(req.body);
@@ -60,8 +63,7 @@ const create = async (req: Request,res: Response): Promise<void> => {
         if(req.body.priority == 'low') Label_priority = (process.env.LABEL_LOW) as string;
         if(req.body.priority == 'medium') Label_priority = (process.env.LABEL_MEDIUM) as string;
         if(req.body.priority == 'high') Label_priority = (process.env.LABEL_HIGH) as string;
-        CreateCard(process.env.TRELLO_MTS_LIST_ID as string, req.body.title, req.body.description , [Label_priority, Label_issue]);
-    //    console.log(classification);
+        CreateCard(process.env.TRELLO_MTS_LIST_ID as string, req.body.title, (req.body.description + "  " + url) , [Label_priority, Label_issue]);
         return;
     } catch (e) {
         res.status(500).json(e);

@@ -12,7 +12,7 @@ interface UserRequest extends Request {
   }
 
 export const authenticate = (req: UserRequest, res: Response, next: NextFunction): void => {
-    if(req.path == '/login' || req.path == '/create-user' ){
+    if(req.path == '/login' || req.path == '/create-user' || req.path=='/uploads/*' ){
         return next();
     }
     const token: string | undefined = req.headers.authorization?.split(' ')[1];
