@@ -34,6 +34,9 @@ const show = async (req: Request, res: Response): Promise<void>=>{
     }
 }
 const create = async (req: Request, res: Response) : Promise<void> =>{
+    if(!(req as UserRequest).user.isAdmin) {
+        res.status(401).json({msg: 'You are not authorized to view this page'});
+    }
     if(!req.body.username || !req.body.password){
         res.status(400).json({msg: 'Please include username and password'});
     }
