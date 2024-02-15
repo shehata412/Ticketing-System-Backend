@@ -38,11 +38,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 
-const create = async (req: Request,res: Response): Promise<void> => {
+const create = async (req: Request,res: Response): Promise<Response> => {
 
     if(!req.body.title || !req.body.description || !req.body.priority || !req.body.status){
-        res.status(400).json({msg: 'Please include title, description, priority, status'});
-        return;
+        return res.status(400).json({msg: 'Please include title, description, priority, status'});
+        ;
     }
     let url: string = ""
     if(req.file){
@@ -51,24 +51,24 @@ const create = async (req: Request,res: Response): Promise<void> => {
     }
     req.body.user_id = (req as UserRequest).user.id;
     try {
-        let Label_issue : string = "";
+        let Label_issue : string =  (process.env.LABEL_BOTH) as string;
         let Label_priority : string = "";
         const newTicket = await Ticket.create(req.body);
-        res.json(newTicket);
-        const classification = await classify_issue(req.body.description);
+//        const classification = await classify_issue(req.body.description);
         
-        if(classification === 'backend') Label_issue = (process.env.LABEL_BACKEND) as string;
-        if(classification === 'frontend') Label_issue = (process.env.LABEL_FRONTEND) as string;
-        if(classification === 'both') Label_issue = (process.env.LABEL_BOTH) as string;
+//        if(classification === 'backend') Label_issue = (process.env.LABEL_BACKEND) as string;
+//       if(classification === 'frontend') Label_issue = (process.env.LABEL_FRONTEND) as string;
+//        if(classification === 'both') Label_issue = (process.env.LABEL_BOTH) as string;
         if(req.body.priority == 'low') Label_priority = (process.env.LABEL_LOW) as string;
         if(req.body.priority == 'medium') Label_priority = (process.env.LABEL_MEDIUM) as string;
         if(req.body.priority == 'high') Label_priority = (process.env.LABEL_HIGH) as string;
 
         CreateCard(process.env.TRELLO_MTS_LIST_ID as string, req.body.title, (req.body.description + "  " + url) , [Label_priority, Label_issue]);
-        return;
+
+        return res.json(newTicket);
+
     } catch (e) {
-        res.status(500).json(e);
-        return;
+        return res.status(500).json(e);
     }
 }
 
