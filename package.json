@@ -7,7 +7,7 @@
     "test": "npm run build && npm run jasmine",
     "lint": "eslint . --ext .ts",
     "build": "tsc",
-    "start": "nodemon src/server.ts",
+    "start": "nodemon src/app.ts",
     "startjs": "nodemon dist/.",
     "jasmine": "jasmine",
     "prettier": "prettier --config .prettierrc {,!(node_modules)/**/}*.ts --write"
