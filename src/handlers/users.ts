@@ -9,6 +9,7 @@ interface UserRequest extends Request {
     user: {
       id: number;
       isAdmin: boolean;
+      username?: string;
     }
   }
 
@@ -65,7 +66,6 @@ const login = async (req: Request, res: Response): Promise<void> => {
             return;
         }
         const userData: User_data = user?.get({plain: true}) as User_data;
-        console.log(userData);
         if (!bcrypt.compareSync(req.body.password + process.env.BCRYPT_PASS as string, userData?.password as string)) {
             res.status(400).json({msg: 'Incorrect password'});
             return;
