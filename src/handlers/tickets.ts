@@ -90,7 +90,16 @@ const create = async (req: Request, res: Response): Promise<Response> => {
 const show = async (req: Request, res: Response): Promise<void> => {
   if ((req as UserRequest).user.isAdmin) {
     try {
-      const allTickets = await Ticket.findAll();
+      const allTickets = await Ticket.findAll(
+        {
+          include: [
+            {
+              model: User,
+              attributes: ["username"],
+            },
+          ],
+        }
+      );
       res.json({ tickets: allTickets, isAdmin: true });
       return;
     } catch (e) {
