@@ -95,7 +95,7 @@ const show = async (req: Request, res: Response): Promise<void> => {
           include: [
             {
               model: User,
-              attributes: ["username"],
+              attributes: ["username"]
             },
           ],
         }
